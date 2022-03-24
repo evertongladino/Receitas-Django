@@ -1,7 +1,6 @@
 from django.db import models
 from django.forms import CharField, DateField
 from datetime import datetime
-from pessoas.models import Pessoa
 from django.contrib.auth.models import User
 
 class Receita(models.Model):
