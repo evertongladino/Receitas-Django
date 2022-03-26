@@ -10,7 +10,7 @@ class Receita(models.Model):
     tempo_de_preparo = models.IntegerField()
     rendimento = models.CharField(max_length=100)
     categoria = models.CharField(max_length=100)
-    date  = models.DateField()
+    date  = models.DateField(default=datetime.today)
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
     publicada = models.BooleanField(default=False)
     foto_publicada = models.ImageField(upload_to='fotos/%d/%m/%Y/', blank=True)
