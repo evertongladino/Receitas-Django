@@ -3,17 +3,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 from receitas.models import Receita
 from django.contrib.auth.models import User
 from django.contrib import auth, messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def index(request):
+    """Busca as receitas, ordena por data e cria uma paginação """
     receitas = Receita.objects.order_by('-date').filter(publicada=True)
-
+    paginator = Paginator(receitas, 6)
+    page = request.GET.get('page')
+    receitas_por_pagina = paginator.get_page(page)
     dados = {
-        'receitas': receitas
+        'receitas': receitas_por_pagina
     }
 
     return render(request, 'receitas/index.html', dados)
 
 def receita(request, receita_id):
+    """Detalha os atributos de uma receita"""
     receita = get_object_or_404(Receita, pk=receita_id)
 
     receita_a_exibir = {
@@ -23,6 +28,7 @@ def receita(request, receita_id):
     return render(request, 'receitas/receita.html', receita_a_exibir)
 
 def cria_receita(request):
+    """Cria uma receita com os dados fornecidos no form de criação de receita"""
     if request.method == 'POST':
         nome_receita= request.POST['nome_receita']
         ingredientes= request.POST['ingredientes']
@@ -41,16 +47,19 @@ def cria_receita(request):
         return render(request, 'receitas/cria_receita.html')
 
 def deleta_receita(request, receita_id):
+    """Deleta uma receita do sistema"""
     receita = get_object_or_404(Receita, pk=receita_id)
     receita.delete()
     return redirect('dashboard')
 
 def altera_receita(request, receita_id):
+    """Carrega a receita escolhida para um form"""
     receita = get_object_or_404(Receita, pk=receita_id)
     receita_a_alterar = { 'receita' : receita }
     return render(request,'receitas/altera_receita.html', receita_a_alterar)
 
 def atualiza_receita(request):
+    """Atualiza uma receita no sistema"""
     if request.method == 'POST':
         receita_id = request.POST['receita_id']
         r = Receita.objects.get(pk=receita_id)
@@ -69,4 +78,5 @@ def atualiza_receita(request):
     return redirect('dashboard')
 
 def campo_vazio(campo):
+    """Checa se um campo está vazio"""
     return not campo.strip()
